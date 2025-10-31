@@ -130,11 +130,12 @@ class MazeGame {
         }
         
         // Add some simple obstacles in the wide sections for interest
-        // First third: Add a simple wall block
+        // First third: Add a wall block that extends to half the maze width
         const obstacle2Y = Math.floor(firstThird * 0.7);
+        const halfWidth = Math.floor(cols / 2); // Half the width (25 columns)
         
-        // Right obstacle in first third
-        for (let x = midX + 2; x <= midX + 4; x++) {
+        // Extended obstacle in first third - from center to half width
+        for (let x = midX; x <= halfWidth; x++) {
             for (let y = obstacle2Y; y <= obstacle2Y + 2; y++) {
                 if (x >= 1 && x < cols - 1 && y >= 1 && y < rows - 1) {
                     this.maze[y][x] = 1;
@@ -157,6 +158,18 @@ class MazeGame {
         this.maze[obstacle3Y][midX + 2] = 0;
         this.maze[obstacle3Y + 1][midX - 2] = 0;
         this.maze[obstacle3Y + 1][midX + 2] = 0;
+        
+        // Third section: Add obstacle in the narrow final passage
+        const obstacle4Y = Math.floor(secondThird + (rows - secondThird) * 0.6);
+        // Three-row obstacle in the center of the narrow path
+        if (obstacle4Y >= 1 && obstacle4Y < rows - 5) { // Leave room before the end
+            for (let y = obstacle4Y; y <= obstacle4Y + 2; y++) { // Three rows long
+                this.maze[y][midX] = 1; // Block the center
+                // Force players to go around by ensuring side paths are clear
+                this.maze[y][midX - 1] = 0; // Left path clear
+                this.maze[y][midX + 1] = 0; // Right path clear
+            }
+        }
     }
     
 
