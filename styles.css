@@ -146,18 +146,20 @@ h1 {
     background: linear-gradient(135deg, #4A90E2, #357ABD);
     color: white;
     border: none;
-    padding: 15px 30px;
-    border-radius: 50px;
+    padding: 5px 10px;
+    border-radius: 25px;
     cursor: pointer;
-    font-size: 1.1em;
+    font-size: 0.9em;
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     transition: all 0.3s ease;
     box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
     border: 2px solid transparent;
     pointer-events: auto;
     position: absolute;
+    width: 60px;
+    height: 30px;
 }
 
 .play-button:hover {

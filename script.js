@@ -202,14 +202,14 @@ class MazeGame {
     }
     
     positionPlayButton() {
-        // Position the play button at the exact start position (top middle of maze)
+        // Position the play button within the wide start area (50px down from start)
         setTimeout(() => {
             // Calculate the exact position where the blue square will start
             // startPos.x and startPos.y are the pixel coordinates in the canvas
             const buttonX = this.startPos.x - (this.playBtn.offsetWidth / 2);
-            const buttonY = this.startPos.y - (this.playBtn.offsetHeight / 2);
+            const buttonY = (this.startPos.y - (this.playBtn.offsetHeight / 2)) + 50; // Move down 50px
             
-            // Position the button at the start location
+            // Position the button within the start area
             this.playBtn.style.left = buttonX + 'px';
             this.playBtn.style.top = buttonY + 'px';
             this.playBtn.style.transform = 'none';
