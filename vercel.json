@@ -1,6 +1,7 @@
 {
-  "version": 2,
-  "public": true,
+  "buildCommand": null,
+  "outputDirectory": "./",
+  "installCommand": null,
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
@@ -29,12 +30,6 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }
