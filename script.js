@@ -119,98 +119,7 @@ class MazeGame {
         }
     }
     
-    generateLevel2() {
-        // More complex maze with vertical path
-        const cols = this.maze[0].length;
-        const rows = this.maze.length;
-        const midX = Math.floor(cols / 2);
-        
-        // Create paths
-        for (let y = 1; y < rows - 1; y++) {
-            for (let x = 1; x < cols - 1; x++) {
-                this.maze[y][x] = 0;
-            }
-        }
-        
-        // Add more complex wall patterns, but avoid blocking center path
-        for (let y = 3; y < rows - 3; y++) {
-            for (let x = 3; x < cols - 3; x++) {
-                if ((x + y) % 5 === 0 && Math.random() < 0.4) {
-                    // Don't place walls too close to center vertical path
-                    if (Math.abs(x - midX) > 4) {
-                        // Create small wall blocks
-                        for (let dy = 0; dy < 2; dy++) {
-                            for (let dx = 0; dx < 2; dx++) {
-                                if (y + dy < rows && x + dx < cols) {
-                                    this.maze[y + dy][x + dx] = 1;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        // Ensure clear vertical path down the middle (wider for small cells)
-        for (let y = 1; y < rows - 1; y++) {
-            for (let pathWidth = -2; pathWidth <= 2; pathWidth++) {
-                const pathX = midX + pathWidth;
-                if (pathX >= 1 && pathX < cols - 1) {
-                    this.maze[y][pathX] = 0;
-                }
-            }
-        }
-    }
-    
-    generateLevel3() {
-        // Very narrow passages
-        const cols = this.maze[0].length;
-        const rows = this.maze.length;
-        
-        // Fill with walls
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                this.maze[y][x] = 1;
-            }
-        }
-        
-        // Create very narrow winding path
-        let currentX = 1;
-        let currentY = 1;
-        this.maze[currentY][currentX] = 0;
-        
-        while (currentX < cols - 2 || currentY < rows - 2) {
-            const directions = [];
-            
-            if (currentX < cols - 2) directions.push('right');
-            if (currentY < rows - 2) directions.push('down');
-            if (currentX > 1 && Math.random() < 0.3) directions.push('left');
-            if (currentY > 1 && Math.random() < 0.3) directions.push('up');
-            
-            const direction = directions[Math.floor(Math.random() * directions.length)];
-            
-            switch (direction) {
-                case 'right': currentX++; break;
-                case 'down': currentY++; break;
-                case 'left': currentX--; break;
-                case 'up': currentY--; break;
-            }
-            
-            this.maze[currentY][currentX] = 0;
-        }
-    }
-    
-    generateRandomMaze() {
-        // Fallback random maze generation
-        const cols = this.maze[0].length;
-        const rows = this.maze.length;
-        
-        for (let y = 1; y < rows - 1; y++) {
-            for (let x = 1; x < cols - 1; x++) {
-                this.maze[y][x] = Math.random() < 0.7 ? 0 : 1;
-            }
-        }
-    }
+
     
     setStartAndEnd() {
         const cols = this.maze[0].length;
@@ -354,15 +263,10 @@ class MazeGame {
         // Check if reached end
         if (this.checkWinCondition()) {
             this.gameWon = true;
-            if (this.statusElement) {
-                if (this.currentLevel < 3) {
-                    this.statusElement.textContent = `Level ${this.currentLevel} Complete! Click restart to continue.`;
-                    this.statusElement.style.color = '#44ff44';
-                } else {
-                    this.statusElement.textContent = 'Congratulations! You completed all levels!';
-                    this.statusElement.style.color = '#44ff44';
-                }
-            }
+            // Automatically restart after winning
+            setTimeout(() => {
+                this.restartLevel();
+            }, 1000); // Brief delay before restart
         }
     }
     
@@ -404,14 +308,8 @@ class MazeGame {
     
     restartLevel() {
         console.log('Restart level called');
-        if (this.gameWon && this.currentLevel < 3) {
-            this.currentLevel++;
-            if (this.levelDisplay) {
-                this.levelDisplay.textContent = `Challenge ${this.currentLevel}`;
-            }
-        }
         
-        // Reset all game state
+        // Reset all game state (no level progression)
         this.showingStartScreen = true;
         this.gameStarted = false;
         this.gameWon = false;
