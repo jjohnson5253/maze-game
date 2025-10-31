@@ -1,3 +1,3 @@
 # Maze Game
 
-Run: `python -m http.server 8000`
+Run: `python3 -m http.server 8000`
