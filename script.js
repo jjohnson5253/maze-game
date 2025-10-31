@@ -16,6 +16,7 @@ class MazeGame {
         this.gameWon = false;
         this.gameLost = false;
         this.showingStartScreen = true;
+        this.jumpScareTriggered = false; // Track if jump scare has been triggered
         
         // Player (blue square) - smaller size for tiny cells
         this.player = {
@@ -36,6 +37,7 @@ class MazeGame {
         this.maze = [];
         this.startPos = { x: 0, y: 0 };
         this.endPos = { x: 0, y: 0 };
+        this.thirdObstacleY = 0; // Store position of third obstacle
         
         this.init();
     }
@@ -161,6 +163,7 @@ class MazeGame {
         
         // Third section: Add obstacle in the narrow final passage
         const obstacle4Y = Math.floor(secondThird + (rows - secondThird) * 0.6);
+        this.thirdObstacleY = obstacle4Y; // Store for jump scare trigger
         // Three-row obstacle in the center of the narrow path
         if (obstacle4Y >= 1 && obstacle4Y < rows - 5) { // Leave room before the end
             for (let y = obstacle4Y; y <= obstacle4Y + 2; y++) { // Three rows long
@@ -344,8 +347,23 @@ class MazeGame {
         this.player.x = newX;
         this.player.y = newY;
         
-        // Check if reached end
-        if (this.checkWinCondition()) {
+        // Check if halfway past the last obstacle
+        if (!this.jumpScareTriggered && this.thirdObstacleY > 0) {
+            const obstacleTopY = this.thirdObstacleY * this.cellSize; // Top of obstacle
+            const obstacleBottomY = (this.thirdObstacleY + 2) * this.cellSize; // Bottom of 3-row obstacle
+            const triggerY = obstacleTopY + ((obstacleBottomY - obstacleTopY) / 2); // Halfway through obstacle
+            
+            if (this.player.y > triggerY) {
+                this.jumpScareTriggered = true;
+                this.gameWon = true;
+                console.log('Halfway past last obstacle, triggering jump scare...');
+                // Show demon image and play scream for jump scare effect
+                this.showDemonImage();
+            }
+        }
+        
+        // Check if reached actual end (for backup, though jump scare should trigger first)
+        if (this.checkWinCondition() && !this.jumpScareTriggered) {
             this.gameWon = true;
             console.log('Reached end of maze, triggering jump scare...');
             // Show demon image and play scream for jump scare effect
@@ -397,6 +415,7 @@ class MazeGame {
         this.gameStarted = false;
         this.gameWon = false;
         this.gameLost = false;
+        this.jumpScareTriggered = false;
         
         // Update status
         if (this.statusElement) {
