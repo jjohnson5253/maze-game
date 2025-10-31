@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scary Maze Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Scary Maze Game</h1>
+        <p class="instructions">Use your mouse (or touch on mobile) to navigate the blue square through the maze!</p>
+        
+        <div class="level-info">
+            <span id="level-display">Challenge 1</span>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+            
+            <!-- Start Screen Overlay -->
+            <div id="start-screen" class="start-screen">
+                <div class="start-content">
+                    <h2>Ready to Begin?</h2>
+                    <p>Navigate the blue square through the maze using your mouse or finger!</p>
+                    <button id="play-btn" class="play-button">PLAY</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-info">
+            <p id="status">Click PLAY to start your maze adventure!</p>
+            <button id="restart-btn">Restart Level</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

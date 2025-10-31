@@ -1,0 +1,472 @@
+class MazeGame {
+    constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.statusElement = document.getElementById('status');
+        this.levelDisplay = document.getElementById('level-display');
+        this.restartBtn = document.getElementById('restart-btn');
+        this.startScreen = document.getElementById('start-screen');
+        this.playBtn = document.getElementById('play-btn');
+        
+        // Game state
+        this.currentLevel = 1;
+        this.gameStarted = false;
+        this.gameWon = false;
+        this.gameLost = false;
+        this.showingStartScreen = true;
+        
+        // Player (blue square)
+        this.player = {
+            x: 0,
+            y: 0,
+            size: 15,
+            color: '#4A90E2'
+        };
+        
+        // Mouse/touch position
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.isMouseOverCanvas = false;
+        
+        // Maze properties
+        this.cellSize = 40;
+        this.maze = [];
+        this.startPos = { x: 0, y: 0 };
+        this.endPos = { x: 0, y: 0 };
+        
+        this.init();
+    }
+    
+    init() {
+        this.setupCanvas();
+        this.generateMaze();
+        this.positionPlayButton();
+        this.setupEventListeners();
+        this.gameLoop();
+    }
+    
+    setupCanvas() {
+        // Set up canvas size based on screen
+        const container = this.canvas.parentElement;
+        const maxWidth = Math.min(800, window.innerWidth - 40);
+        const maxHeight = Math.min(600, window.innerHeight - 200);
+        
+        this.canvas.width = maxWidth;
+        this.canvas.height = maxHeight;
+        
+        // Update cell size based on canvas size
+        this.cellSize = Math.max(30, Math.min(50, maxWidth / 16));
+        
+        this.canvas.style.width = maxWidth + 'px';
+        this.canvas.style.height = maxHeight + 'px';
+    }
+    
+    generateMaze() {
+        const cols = Math.floor(this.canvas.width / this.cellSize);
+        const rows = Math.floor(this.canvas.height / this.cellSize);
+        
+        // Create maze array (1 = wall, 0 = path)
+        this.maze = [];
+        for (let y = 0; y < rows; y++) {
+            this.maze[y] = [];
+            for (let x = 0; x < cols; x++) {
+                this.maze[y][x] = 1; // Start with all walls
+            }
+        }
+        
+        // Generate different maze patterns based on level
+        switch (this.currentLevel) {
+            case 1:
+                this.generateLevel1();
+                break;
+            case 2:
+                this.generateLevel2();
+                break;
+            case 3:
+                this.generateLevel3();
+                break;
+            default:
+                this.generateRandomMaze();
+        }
+        
+        this.setStartAndEnd();
+    }
+    
+    generateLevel1() {
+        // Simple maze like in the reference image
+        const cols = this.maze[0].length;
+        const rows = this.maze.length;
+        
+        // Create a simple path
+        for (let y = 1; y < rows - 1; y++) {
+            for (let x = 1; x < cols - 1; x++) {
+                this.maze[y][x] = 0;
+            }
+        }
+        
+        // Add some walls to create a simple maze
+        for (let y = 2; y < rows - 2; y += 2) {
+            for (let x = 3; x < cols - 3; x += 3) {
+                this.maze[y][x] = 1;
+                this.maze[y][x + 1] = 1;
+                this.maze[y + 1][x] = 1;
+            }
+        }
+        
+        // Create a narrow corridor like in the reference
+        const midY = Math.floor(rows / 2);
+        for (let x = 2; x < cols - 8; x++) {
+            if (x > 2 && x < cols - 10) {
+                this.maze[midY - 1][x] = 1;
+                this.maze[midY + 1][x] = 1;
+            }
+        }
+    }
+    
+    generateLevel2() {
+        // More complex maze
+        const cols = this.maze[0].length;
+        const rows = this.maze.length;
+        
+        // Create paths
+        for (let y = 1; y < rows - 1; y++) {
+            for (let x = 1; x < cols - 1; x++) {
+                this.maze[y][x] = 0;
+            }
+        }
+        
+        // Add more complex wall patterns
+        for (let y = 2; y < rows - 2; y++) {
+            for (let x = 2; x < cols - 2; x++) {
+                if ((x + y) % 3 === 0 && Math.random() < 0.6) {
+                    this.maze[y][x] = 1;
+                }
+            }
+        }
+    }
+    
+    generateLevel3() {
+        // Very narrow passages
+        const cols = this.maze[0].length;
+        const rows = this.maze.length;
+        
+        // Fill with walls
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                this.maze[y][x] = 1;
+            }
+        }
+        
+        // Create very narrow winding path
+        let currentX = 1;
+        let currentY = 1;
+        this.maze[currentY][currentX] = 0;
+        
+        while (currentX < cols - 2 || currentY < rows - 2) {
+            const directions = [];
+            
+            if (currentX < cols - 2) directions.push('right');
+            if (currentY < rows - 2) directions.push('down');
+            if (currentX > 1 && Math.random() < 0.3) directions.push('left');
+            if (currentY > 1 && Math.random() < 0.3) directions.push('up');
+            
+            const direction = directions[Math.floor(Math.random() * directions.length)];
+            
+            switch (direction) {
+                case 'right': currentX++; break;
+                case 'down': currentY++; break;
+                case 'left': currentX--; break;
+                case 'up': currentY--; break;
+            }
+            
+            this.maze[currentY][currentX] = 0;
+        }
+    }
+    
+    generateRandomMaze() {
+        // Fallback random maze generation
+        const cols = this.maze[0].length;
+        const rows = this.maze.length;
+        
+        for (let y = 1; y < rows - 1; y++) {
+            for (let x = 1; x < cols - 1; x++) {
+                this.maze[y][x] = Math.random() < 0.7 ? 0 : 1;
+            }
+        }
+    }
+    
+    setStartAndEnd() {
+        const cols = this.maze[0].length;
+        const rows = this.maze.length;
+        
+        // Find start position (top-left area)
+        for (let y = 1; y < rows; y++) {
+            for (let x = 1; x < cols; x++) {
+                if (this.maze[y][x] === 0) {
+                    this.startPos = { x: x * this.cellSize + this.cellSize / 2, y: y * this.cellSize + this.cellSize / 2 };
+                    this.player.x = this.startPos.x;
+                    this.player.y = this.startPos.y;
+                    break;
+                }
+            }
+            if (this.startPos.x > 0) break;
+        }
+        
+        // Find end position (bottom-right area)
+        for (let y = rows - 2; y >= 0; y--) {
+            for (let x = cols - 2; x >= 0; x--) {
+                if (this.maze[y][x] === 0) {
+                    this.endPos = { x: x * this.cellSize + this.cellSize / 2, y: y * this.cellSize + this.cellSize / 2 };
+                    break;
+                }
+            }
+            if (this.endPos.x > 0) break;
+        }
+    }
+    
+    positionPlayButton() {
+        // Position the play button at the actual maze start location
+        setTimeout(() => {
+            const rect = this.canvas.getBoundingClientRect();
+            const canvasContainer = this.canvas.parentElement;
+            
+            // Calculate the actual pixel position of the start location on the rendered canvas
+            const scaleX = rect.width / this.canvas.width;
+            const scaleY = rect.height / this.canvas.height;
+            
+            const buttonX = (this.startPos.x * scaleX) - (this.playBtn.offsetWidth / 2);
+            const buttonY = (this.startPos.y * scaleY) - (this.playBtn.offsetHeight / 2);
+            
+            // Position relative to the canvas
+            this.playBtn.style.position = 'absolute';
+            this.playBtn.style.left = buttonX + 'px';
+            this.playBtn.style.top = buttonY + 'px';
+            this.playBtn.style.transform = 'none';
+            this.playBtn.style.zIndex = '20';
+        }, 100);
+    }
+    
+    setupEventListeners() {
+        // Mouse events
+        this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        this.canvas.addEventListener('mouseenter', () => this.isMouseOverCanvas = true);
+        this.canvas.addEventListener('mouseleave', () => this.isMouseOverCanvas = false);
+        
+        // Touch events for mobile
+        this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e));
+        this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e));
+        this.canvas.addEventListener('touchend', () => this.isMouseOverCanvas = false);
+        
+        // Play button
+        this.playBtn.addEventListener('click', () => this.startGame());
+        
+        // Restart button
+        this.restartBtn.addEventListener('click', () => this.restartLevel());
+        
+        // Window resize
+        window.addEventListener('resize', () => this.handleResize());
+    }
+    
+    startGame() {
+        this.showingStartScreen = false;
+        this.startScreen.classList.add('hidden');
+        this.gameStarted = true;
+        this.statusElement.textContent = 'Navigate to the red area to win!';
+        
+        // Set initial mouse position to start position so player doesn't immediately lose
+        this.mouseX = this.startPos.x;
+        this.mouseY = this.startPos.y;
+        this.player.x = this.startPos.x;
+        this.player.y = this.startPos.y;
+        
+        // Enable cursor tracking
+        this.canvas.style.cursor = 'none';
+    }
+
+    handleMouseMove(e) {
+        if (this.showingStartScreen || !this.gameStarted) return;
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        
+        this.mouseX = (e.clientX - rect.left) * scaleX;
+        this.mouseY = (e.clientY - rect.top) * scaleY;
+        
+        this.updatePlayerPosition();
+    }
+    
+    handleTouchStart(e) {
+        e.preventDefault();
+        this.isMouseOverCanvas = true;
+        this.handleTouchMove(e);
+    }
+    
+    handleTouchMove(e) {
+        if (this.showingStartScreen || !this.gameStarted) return;
+        
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        
+        this.mouseX = (touch.clientX - rect.left) * scaleX;
+        this.mouseY = (touch.clientY - rect.top) * scaleY;
+        
+        this.updatePlayerPosition();
+    }
+    
+    updatePlayerPosition() {
+        if (this.gameLost || this.gameWon) return;
+        
+        const newX = this.mouseX;
+        const newY = this.mouseY;
+        
+        // Check collision with walls
+        if (this.checkCollision(newX, newY)) {
+            this.gameLost = true;
+            this.statusElement.textContent = 'Game Over! You hit a wall. Try again!';
+            this.statusElement.style.color = '#ff4444';
+            return;
+        }
+        
+        // Update player position
+        this.player.x = newX;
+        this.player.y = newY;
+        
+        // Check if reached end
+        if (this.checkWinCondition()) {
+            this.gameWon = true;
+            if (this.currentLevel < 3) {
+                this.statusElement.textContent = `Level ${this.currentLevel} Complete! Click restart to continue.`;
+                this.statusElement.style.color = '#44ff44';
+            } else {
+                this.statusElement.textContent = 'Congratulations! You completed all levels!';
+                this.statusElement.style.color = '#44ff44';
+            }
+        }
+    }
+    
+    checkCollision(x, y) {
+        const halfSize = this.player.size / 2;
+        
+        // Check corners of the player square
+        const corners = [
+            { x: x - halfSize, y: y - halfSize },
+            { x: x + halfSize, y: y - halfSize },
+            { x: x - halfSize, y: y + halfSize },
+            { x: x + halfSize, y: y + halfSize }
+        ];
+        
+        for (const corner of corners) {
+            const gridX = Math.floor(corner.x / this.cellSize);
+            const gridY = Math.floor(corner.y / this.cellSize);
+            
+            if (gridX < 0 || gridX >= this.maze[0].length || gridY < 0 || gridY >= this.maze.length) {
+                return true; // Out of bounds
+            }
+            
+            if (this.maze[gridY] && this.maze[gridY][gridX] === 1) {
+                return true; // Hit a wall
+            }
+        }
+        
+        return false;
+    }
+    
+    checkWinCondition() {
+        const distance = Math.sqrt(
+            Math.pow(this.player.x - this.endPos.x, 2) +
+            Math.pow(this.player.y - this.endPos.y, 2)
+        );
+        
+        return distance < this.cellSize / 2;
+    }
+    
+    restartLevel() {
+        if (this.gameWon && this.currentLevel < 3) {
+            this.currentLevel++;
+            this.levelDisplay.textContent = `Challenge ${this.currentLevel}`;
+        }
+        
+        this.showingStartScreen = true;
+        this.gameStarted = false;
+        this.gameWon = false;
+        this.gameLost = false;
+        this.statusElement.textContent = 'Click PLAY to start your maze adventure!';
+        this.statusElement.style.color = 'white';
+        
+        // Show start screen again
+        this.startScreen.classList.remove('hidden');
+        this.canvas.style.cursor = 'default';
+        
+        this.generateMaze();
+        this.positionPlayButton();
+    }
+    
+    handleResize() {
+        this.setupCanvas();
+        this.generateMaze();
+        if (this.showingStartScreen) {
+            this.positionPlayButton();
+        }
+    }
+    
+    draw() {
+        // Clear canvas
+        this.ctx.fillStyle = '#000000';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw maze
+        this.ctx.fillStyle = '#ffffff';
+        for (let y = 0; y < this.maze.length; y++) {
+            for (let x = 0; x < this.maze[y].length; x++) {
+                if (this.maze[y][x] === 1) {
+                    this.ctx.fillRect(
+                        x * this.cellSize,
+                        y * this.cellSize,
+                        this.cellSize,
+                        this.cellSize
+                    );
+                }
+            }
+        }
+        
+        // Draw end zone
+        this.ctx.fillStyle = '#ff4444';
+        this.ctx.beginPath();
+        this.ctx.arc(this.endPos.x, this.endPos.y, this.cellSize / 2, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Draw player
+        this.ctx.fillStyle = this.player.color;
+        this.ctx.fillRect(
+            this.player.x - this.player.size / 2,
+            this.player.y - this.player.size / 2,
+            this.player.size,
+            this.player.size
+        );
+        
+        // Add glow effect to player
+        this.ctx.shadowColor = this.player.color;
+        this.ctx.shadowBlur = 10;
+        this.ctx.fillRect(
+            this.player.x - this.player.size / 2,
+            this.player.y - this.player.size / 2,
+            this.player.size,
+            this.player.size
+        );
+        this.ctx.shadowBlur = 0;
+    }
+    
+    gameLoop() {
+        this.draw();
+        requestAnimationFrame(() => this.gameLoop());
+    }
+}
+
+// Initialize the game when the page loads
+window.addEventListener('load', () => {
+    new MazeGame();
+});
