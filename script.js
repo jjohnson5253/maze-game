@@ -208,46 +208,49 @@ class MazeGame {
     setStartAndEnd() {
         const cols = this.maze[0].length;
         const rows = this.maze.length;
-        const midX = Math.floor(cols / 2);
         
-        // Set start position at top middle
-        // Make sure there's a clear path at the top middle
-        this.maze[1][midX] = 0; // Ensure start position is clear
+        // For true center positioning, use exact pixel center of the maze
+        const centerX = this.mazeWidth / 2; // 300px / 2 = 150px
+        const centerGridX = Math.floor(centerX / this.cellSize); // Which grid cell this falls into
+        
+        // Set start position at top middle (exact center)
+        // Make sure there's a clear path at the center
+        this.maze[1][centerGridX] = 0; // Ensure start position is clear
+        // Also clear adjacent cells for easier navigation
+        if (centerGridX > 0) this.maze[1][centerGridX - 1] = 0;
+        if (centerGridX < cols - 1) this.maze[1][centerGridX + 1] = 0;
+        
         this.startPos = { 
-            x: midX * this.cellSize + this.cellSize / 2, 
-            y: 1 * this.cellSize + this.cellSize / 2 
+            x: centerX, // Exact pixel center: 150px
+            y: 1 * this.cellSize + this.cellSize / 2  // Top row center
         };
         this.player.x = this.startPos.x;
         this.player.y = this.startPos.y;
         
-        // Set end position at bottom middle  
-        // Make sure there's a clear path at the bottom middle
-        this.maze[rows - 2][midX] = 0; // Ensure end position is clear
+        // Set end position at bottom middle (exact center)
+        this.maze[rows - 2][centerGridX] = 0; // Ensure end position is clear
+        if (centerGridX > 0) this.maze[rows - 2][centerGridX - 1] = 0;
+        if (centerGridX < cols - 1) this.maze[rows - 2][centerGridX + 1] = 0;
+        
         this.endPos = { 
-            x: midX * this.cellSize + this.cellSize / 2, 
+            x: centerX, // Exact pixel center: 150px
             y: (rows - 2) * this.cellSize + this.cellSize / 2 
         };
     }
     
     positionPlayButton() {
-        // Position the play button at the top middle start location
+        // Position the play button at the exact start position (top middle of maze)
         setTimeout(() => {
-            const rect = this.canvas.getBoundingClientRect();
+            // Calculate the exact position where the blue square will start
+            // startPos.x and startPos.y are the pixel coordinates in the canvas
+            const buttonX = this.startPos.x - (this.playBtn.offsetWidth / 2);
+            const buttonY = this.startPos.y - (this.playBtn.offsetHeight / 2);
             
-            // Calculate the actual pixel position of the start location on the rendered canvas
-            const scaleX = rect.width / this.canvas.width;
-            const scaleY = rect.height / this.canvas.height;
-            
-            const buttonX = (this.startPos.x * scaleX) - (this.playBtn.offsetWidth / 2);
-            const buttonY = (this.startPos.y * scaleY) - (this.playBtn.offsetHeight / 2);
-            
-            // Position relative to the canvas
-            this.playBtn.style.position = 'absolute';
+            // Position the button at the start location
             this.playBtn.style.left = buttonX + 'px';
             this.playBtn.style.top = buttonY + 'px';
             this.playBtn.style.transform = 'none';
-            this.playBtn.style.zIndex = '20';
-        }, 100);
+        }, 50);
     }
     
     setupEventListeners() {

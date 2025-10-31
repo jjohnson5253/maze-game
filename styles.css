@@ -117,12 +117,10 @@ h1 {
 .start-content {
     text-align: center;
     padding: 20px;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
     z-index: 15;
-    pointer-events: none;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .start-content h2,
@@ -159,7 +157,7 @@ h1 {
     box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
     border: 2px solid transparent;
     pointer-events: auto;
-    position: relative;
+    position: absolute;
 }
 
 .play-button:hover {
