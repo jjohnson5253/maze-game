@@ -1,0 +1,33 @@
+{
+  "name": "scary-maze-game",
+  "version": "1.0.0",
+  "description": "A fun maze game where you navigate a blue square through challenging mazes using your mouse or touch",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "start": "python3 -m http.server 8000",
+    "build": "echo 'No build step needed for static files'",
+    "preview": "python3 -m http.server 4173"
+  },
+  "keywords": [
+    "maze",
+    "game",
+    "html5",
+    "canvas",
+    "javascript",
+    "mouse-control",
+    "touch-control",
+    "browser-game"
+  ],
+  "author": "Jake Johnson",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/scary-maze-game.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
