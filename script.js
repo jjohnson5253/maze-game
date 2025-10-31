@@ -127,18 +127,8 @@ class MazeGame {
         }
         
         // Add some simple obstacles in the wide sections for interest
-        // First third: Add a few simple wall blocks
-        const obstacle1Y = Math.floor(firstThird * 0.3);
+        // First third: Add a simple wall block
         const obstacle2Y = Math.floor(firstThird * 0.7);
-        
-        // Left obstacle in first third
-        for (let x = midX - 4; x <= midX - 2; x++) {
-            for (let y = obstacle1Y; y <= obstacle1Y + 2; y++) {
-                if (x >= 1 && x < cols - 1 && y >= 1 && y < rows - 1) {
-                    this.maze[y][x] = 1;
-                }
-            }
-        }
         
         // Right obstacle in first third
         for (let x = midX + 2; x <= midX + 4; x++) {
