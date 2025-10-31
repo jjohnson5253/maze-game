@@ -324,7 +324,7 @@ class MazeGame {
         const scaleY = this.canvas.height / rect.height;
         
         this.mouseX = (touch.clientX - rect.left) * scaleX;
-        this.mouseY = (touch.clientY - rect.top) * scaleY - 70; // Offset 70px above touch point
+        this.mouseY = (touch.clientY - rect.top) * scaleY - 40; // Offset 40px above touch point
         
         this.updatePlayerPosition();
     }
