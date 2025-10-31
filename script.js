@@ -229,15 +229,8 @@ class MazeGame {
         const screamAudio = new Audio('scream.wav');
         screamAudio.play().catch(e => console.log('Audio play failed:', e));
         
-        // Show the demon image
+        // Show the demon image (and keep it visible)
         this.demonImg.style.display = 'block';
-        
-        // Hide it after 2 seconds
-        setTimeout(() => {
-            if (this.demonImg) {
-                this.demonImg.style.display = 'none';
-            }
-        }, 2000);
     }
     
     setupEventListeners() {
@@ -344,10 +337,6 @@ class MazeGame {
             console.log('Reached end of maze, triggering jump scare...');
             // Show demon image and play scream for jump scare effect
             this.showDemonImage();
-            // Automatically restart after the scare
-            setTimeout(() => {
-                this.restartLevel();
-            }, 2500); // Wait a bit longer to let the jump scare finish
         }
     }
     
