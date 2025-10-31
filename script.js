@@ -2,8 +2,8 @@ class MazeGame {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
-        this.statusElement = document.getElementById('status');
-        this.levelDisplay = document.getElementById('level-display');
+        this.statusElement = document.getElementById('status'); // May be null
+        this.levelDisplay = document.getElementById('level-display'); // May be null
         this.restartBtn = document.getElementById('restart-btn');
         this.startScreen = document.getElementById('start-screen');
         this.playBtn = document.getElementById('play-btn');
@@ -343,12 +343,14 @@ class MazeGame {
         // Check if reached end
         if (this.checkWinCondition()) {
             this.gameWon = true;
-            if (this.currentLevel < 3) {
-                this.statusElement.textContent = `Level ${this.currentLevel} Complete! Click restart to continue.`;
-                this.statusElement.style.color = '#44ff44';
-            } else {
-                this.statusElement.textContent = 'Congratulations! You completed all levels!';
-                this.statusElement.style.color = '#44ff44';
+            if (this.statusElement) {
+                if (this.currentLevel < 3) {
+                    this.statusElement.textContent = `Level ${this.currentLevel} Complete! Click restart to continue.`;
+                    this.statusElement.style.color = '#44ff44';
+                } else {
+                    this.statusElement.textContent = 'Congratulations! You completed all levels!';
+                    this.statusElement.style.color = '#44ff44';
+                }
             }
         }
     }
@@ -393,7 +395,9 @@ class MazeGame {
         console.log('Restart level called');
         if (this.gameWon && this.currentLevel < 3) {
             this.currentLevel++;
-            this.levelDisplay.textContent = `Challenge ${this.currentLevel}`;
+            if (this.levelDisplay) {
+                this.levelDisplay.textContent = `Challenge ${this.currentLevel}`;
+            }
         }
         
         // Reset all game state
