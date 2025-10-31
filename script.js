@@ -93,9 +93,10 @@ class MazeGame {
     }
     
     generateLevel1() {
-        // Simple maze like in the reference image
+        // Simple maze with vertical path from top middle to bottom middle
         const cols = this.maze[0].length;
         const rows = this.maze.length;
+        const midX = Math.floor(cols / 2);
         
         // Create a simple path
         for (let y = 1; y < rows - 1; y++) {
@@ -107,26 +108,29 @@ class MazeGame {
         // Add some walls to create a simple maze
         for (let y = 2; y < rows - 2; y += 2) {
             for (let x = 3; x < cols - 3; x += 3) {
-                this.maze[y][x] = 1;
-                this.maze[y][x + 1] = 1;
-                this.maze[y + 1][x] = 1;
+                // Skip walls that would block the center vertical path
+                if (Math.abs(x - midX) > 2) {
+                    this.maze[y][x] = 1;
+                    this.maze[y][x + 1] = 1;
+                    this.maze[y + 1][x] = 1;
+                }
             }
         }
         
-        // Create a narrow corridor like in the reference
-        const midY = Math.floor(rows / 2);
-        for (let x = 2; x < cols - 8; x++) {
-            if (x > 2 && x < cols - 10) {
-                this.maze[midY - 1][x] = 1;
-                this.maze[midY + 1][x] = 1;
-            }
+        // Ensure clear vertical path down the middle
+        for (let y = 1; y < rows - 1; y++) {
+            this.maze[y][midX] = 0;
+            // Also clear adjacent cells for a wider path
+            if (midX - 1 >= 1) this.maze[y][midX - 1] = 0;
+            if (midX + 1 < cols - 1) this.maze[y][midX + 1] = 0;
         }
     }
     
     generateLevel2() {
-        // More complex maze
+        // More complex maze with vertical path
         const cols = this.maze[0].length;
         const rows = this.maze.length;
+        const midX = Math.floor(cols / 2);
         
         // Create paths
         for (let y = 1; y < rows - 1; y++) {
@@ -135,13 +139,21 @@ class MazeGame {
             }
         }
         
-        // Add more complex wall patterns
+        // Add more complex wall patterns, but avoid blocking center path
         for (let y = 2; y < rows - 2; y++) {
             for (let x = 2; x < cols - 2; x++) {
                 if ((x + y) % 3 === 0 && Math.random() < 0.6) {
-                    this.maze[y][x] = 1;
+                    // Don't place walls too close to center vertical path
+                    if (Math.abs(x - midX) > 1) {
+                        this.maze[y][x] = 1;
+                    }
                 }
             }
+        }
+        
+        // Ensure clear vertical path down the middle
+        for (let y = 1; y < rows - 1; y++) {
+            this.maze[y][midX] = 0;
         }
     }
     
@@ -198,37 +210,31 @@ class MazeGame {
     setStartAndEnd() {
         const cols = this.maze[0].length;
         const rows = this.maze.length;
+        const midX = Math.floor(cols / 2);
         
-        // Find start position (top-left area)
-        for (let y = 1; y < rows; y++) {
-            for (let x = 1; x < cols; x++) {
-                if (this.maze[y][x] === 0) {
-                    this.startPos = { x: x * this.cellSize + this.cellSize / 2, y: y * this.cellSize + this.cellSize / 2 };
-                    this.player.x = this.startPos.x;
-                    this.player.y = this.startPos.y;
-                    break;
-                }
-            }
-            if (this.startPos.x > 0) break;
-        }
+        // Set start position at top middle
+        // Make sure there's a clear path at the top middle
+        this.maze[1][midX] = 0; // Ensure start position is clear
+        this.startPos = { 
+            x: midX * this.cellSize + this.cellSize / 2, 
+            y: 1 * this.cellSize + this.cellSize / 2 
+        };
+        this.player.x = this.startPos.x;
+        this.player.y = this.startPos.y;
         
-        // Find end position (bottom-right area)
-        for (let y = rows - 2; y >= 0; y--) {
-            for (let x = cols - 2; x >= 0; x--) {
-                if (this.maze[y][x] === 0) {
-                    this.endPos = { x: x * this.cellSize + this.cellSize / 2, y: y * this.cellSize + this.cellSize / 2 };
-                    break;
-                }
-            }
-            if (this.endPos.x > 0) break;
-        }
+        // Set end position at bottom middle  
+        // Make sure there's a clear path at the bottom middle
+        this.maze[rows - 2][midX] = 0; // Ensure end position is clear
+        this.endPos = { 
+            x: midX * this.cellSize + this.cellSize / 2, 
+            y: (rows - 2) * this.cellSize + this.cellSize / 2 
+        };
     }
     
     positionPlayButton() {
-        // Position the play button at the actual maze start location
+        // Position the play button at the top middle start location
         setTimeout(() => {
             const rect = this.canvas.getBoundingClientRect();
-            const canvasContainer = this.canvas.parentElement;
             
             // Calculate the actual pixel position of the start location on the rendered canvas
             const scaleX = rect.width / this.canvas.width;
