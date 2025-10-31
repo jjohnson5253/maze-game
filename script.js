@@ -213,7 +213,7 @@ class MazeGame {
         // Create demon image element if it doesn't exist
         if (!this.demonImg) {
             this.demonImg = document.createElement('img');
-            this.demonImg.src = 'demon.png';
+            this.demonImg.src = 'image.png';
             this.demonImg.style.position = 'fixed';
             this.demonImg.style.top = '50%';
             this.demonImg.style.left = '50%';
@@ -226,7 +226,7 @@ class MazeGame {
         }
         
         // Play scream sound
-        const screamAudio = new Audio('scream.wav');
+        const screamAudio = new Audio('sound.wav');
         screamAudio.play().catch(e => console.log('Audio play failed:', e));
         
         // Show the demon image (and keep it visible)
