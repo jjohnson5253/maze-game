@@ -228,13 +228,13 @@ class MazeGame {
         this.canvas.addEventListener('touchend', () => this.isMouseOverCanvas = false);
         
         // Play button
-        this.playBtn.addEventListener('click', () => this.startGame());
+        this.playBtn.addEventListener('click', (e) => this.startGame(e));
         
         // Window resize
         window.addEventListener('resize', () => this.handleResize());
     }
     
-    startGame() {
+    startGame(clickEvent) {
         console.log('Start game called');
         this.showingStartScreen = false;
         this.startScreen.classList.add('hidden');
@@ -244,15 +244,22 @@ class MazeGame {
             this.statusElement.textContent = 'Navigate to the red area to win!';
         }
         
-        // Set initial mouse position to start position so player doesn't immediately lose
-        this.mouseX = this.startPos.x;
-        this.mouseY = this.startPos.y;
-        this.player.x = this.startPos.x;
-        this.player.y = this.startPos.y;
+        // Get the mouse position from the click event relative to canvas
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        
+        // Calculate where the click happened on the canvas
+        this.mouseX = (clickEvent.clientX - rect.left) * scaleX;
+        this.mouseY = (clickEvent.clientY - rect.top) * scaleY;
+        
+        // Position the blue rectangle exactly where the mouse was clicked
+        this.player.x = this.mouseX;
+        this.player.y = this.mouseY;
         
         // Enable cursor tracking
         this.canvas.style.cursor = 'none';
-        console.log('Game started successfully');
+        console.log('Game started successfully at position:', this.mouseX, this.mouseY);
     }
 
     handleMouseMove(e) {
