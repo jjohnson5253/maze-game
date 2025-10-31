@@ -225,6 +225,10 @@ class MazeGame {
             document.body.appendChild(this.demonImg);
         }
         
+        // Play scream sound
+        const screamAudio = new Audio('scream.wav');
+        screamAudio.play().catch(e => console.log('Audio play failed:', e));
+        
         // Show the demon image
         this.demonImg.style.display = 'block';
         
@@ -325,8 +329,6 @@ class MazeGame {
         // Check collision with walls
         if (this.checkCollision(newX, newY)) {
             console.log('Wall collision detected, restarting level...');
-            // Show demon image for jump scare effect
-            this.showDemonImage();
             // Automatically restart the level by showing the play screen again
             this.restartLevel();
             return;
@@ -339,10 +341,13 @@ class MazeGame {
         // Check if reached end
         if (this.checkWinCondition()) {
             this.gameWon = true;
-            // Automatically restart after winning
+            console.log('Reached end of maze, triggering jump scare...');
+            // Show demon image and play scream for jump scare effect
+            this.showDemonImage();
+            // Automatically restart after the scare
             setTimeout(() => {
                 this.restartLevel();
-            }, 1000); // Brief delay before restart
+            }, 2500); // Wait a bit longer to let the jump scare finish
         }
     }
     
