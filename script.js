@@ -14,11 +14,11 @@ class MazeGame {
         this.gameLost = false;
         this.showingStartScreen = true;
         
-        // Player (blue square)
+        // Player (blue square) - smaller size for tiny cells
         this.player = {
             x: 0,
             y: 0,
-            size: 15,
+            size: 4, // Much smaller to fit in 6px cells
             color: '#4A90E2'
         };
         
@@ -28,7 +28,7 @@ class MazeGame {
         this.isMouseOverCanvas = false;
         
         // Maze properties - Fixed size
-        this.cellSize = 50; // Fixed wall width
+        this.cellSize = 6; // Fixed wall width (50px / 8 = 6.25px, rounded to 6px)
         this.mazeWidth = 300; // Fixed maze width
         this.maze = [];
         this.startPos = { x: 0, y: 0 };
@@ -59,9 +59,9 @@ class MazeGame {
     }
     
     generateMaze() {
-        // Fixed maze grid: 300px / 50px = 6 cols, 225px / 50px = 4.5 ≈ 5 rows (rounded up)
-        const cols = Math.floor(this.canvas.width / this.cellSize);   // 6 columns
-        const rows = Math.floor(this.canvas.height / this.cellSize);  // 4-5 rows depending on height
+        // Fixed maze grid: 300px / 6px = 50 cols, 450px / 6px = 75 rows
+        const cols = Math.floor(this.canvas.width / this.cellSize);   // 50 columns
+        const rows = Math.floor(this.canvas.height / this.cellSize);  // 75 rows
         
         // Create maze array (1 = wall, 0 = path)
         this.maze = [];
@@ -72,20 +72,8 @@ class MazeGame {
             }
         }
         
-        // Generate different maze patterns based on level
-        switch (this.currentLevel) {
-            case 1:
-                this.generateLevel1();
-                break;
-            case 2:
-                this.generateLevel2();
-                break;
-            case 3:
-                this.generateLevel3();
-                break;
-            default:
-                this.generateRandomMaze();
-        }
+        // Generate single level maze pattern
+        this.generateLevel1();
         
         this.setStartAndEnd();
     }
@@ -103,24 +91,31 @@ class MazeGame {
             }
         }
         
-        // Add some walls to create a simple maze
-        for (let y = 2; y < rows - 2; y += 2) {
-            for (let x = 3; x < cols - 3; x += 3) {
+        // Add some walls to create a simple maze (adjusted for smaller cells)
+        for (let y = 5; y < rows - 5; y += 8) {
+            for (let x = 8; x < cols - 8; x += 10) {
                 // Skip walls that would block the center vertical path
-                if (Math.abs(x - midX) > 2) {
-                    this.maze[y][x] = 1;
-                    this.maze[y][x + 1] = 1;
-                    this.maze[y + 1][x] = 1;
+                if (Math.abs(x - midX) > 5) {
+                    // Create small wall clusters
+                    for (let dy = 0; dy < 4; dy++) {
+                        for (let dx = 0; dx < 4; dx++) {
+                            if (y + dy < rows && x + dx < cols) {
+                                this.maze[y + dy][x + dx] = 1;
+                            }
+                        }
+                    }
                 }
             }
         }
         
-        // Ensure clear vertical path down the middle
+        // Ensure clear vertical path down the middle (wider path for tiny cells)
         for (let y = 1; y < rows - 1; y++) {
-            this.maze[y][midX] = 0;
-            // Also clear adjacent cells for a wider path
-            if (midX - 1 >= 1) this.maze[y][midX - 1] = 0;
-            if (midX + 1 < cols - 1) this.maze[y][midX + 1] = 0;
+            for (let pathWidth = -3; pathWidth <= 3; pathWidth++) {
+                const pathX = midX + pathWidth;
+                if (pathX >= 1 && pathX < cols - 1) {
+                    this.maze[y][pathX] = 0;
+                }
+            }
         }
     }
     
@@ -138,20 +133,32 @@ class MazeGame {
         }
         
         // Add more complex wall patterns, but avoid blocking center path
-        for (let y = 2; y < rows - 2; y++) {
-            for (let x = 2; x < cols - 2; x++) {
-                if ((x + y) % 3 === 0 && Math.random() < 0.6) {
+        for (let y = 3; y < rows - 3; y++) {
+            for (let x = 3; x < cols - 3; x++) {
+                if ((x + y) % 5 === 0 && Math.random() < 0.4) {
                     // Don't place walls too close to center vertical path
-                    if (Math.abs(x - midX) > 1) {
-                        this.maze[y][x] = 1;
+                    if (Math.abs(x - midX) > 4) {
+                        // Create small wall blocks
+                        for (let dy = 0; dy < 2; dy++) {
+                            for (let dx = 0; dx < 2; dx++) {
+                                if (y + dy < rows && x + dx < cols) {
+                                    this.maze[y + dy][x + dx] = 1;
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
         
-        // Ensure clear vertical path down the middle
+        // Ensure clear vertical path down the middle (wider for small cells)
         for (let y = 1; y < rows - 1; y++) {
-            this.maze[y][midX] = 0;
+            for (let pathWidth = -2; pathWidth <= 2; pathWidth++) {
+                const pathX = midX + pathWidth;
+                if (pathX >= 1 && pathX < cols - 1) {
+                    this.maze[y][pathX] = 0;
+                }
+            }
         }
     }
     
