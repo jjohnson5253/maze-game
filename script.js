@@ -7,6 +7,9 @@ class MazeGame {
         this.startScreen = document.getElementById('start-screen');
         this.playBtn = document.getElementById('play-btn');
         
+        // Demon image element for jump scare
+        this.demonImg = null;
+        
         // Game state
         this.currentLevel = 1;
         this.gameStarted = false;
@@ -206,6 +209,33 @@ class MazeGame {
         }, 50);
     }
     
+    showDemonImage() {
+        // Create demon image element if it doesn't exist
+        if (!this.demonImg) {
+            this.demonImg = document.createElement('img');
+            this.demonImg.src = 'demon.png';
+            this.demonImg.style.position = 'fixed';
+            this.demonImg.style.top = '50%';
+            this.demonImg.style.left = '50%';
+            this.demonImg.style.transform = 'translate(-50%, -50%)';
+            this.demonImg.style.maxWidth = '400px';
+            this.demonImg.style.height = 'auto';
+            this.demonImg.style.zIndex = '10000';
+            this.demonImg.style.display = 'none';
+            document.body.appendChild(this.demonImg);
+        }
+        
+        // Show the demon image
+        this.demonImg.style.display = 'block';
+        
+        // Hide it after 2 seconds
+        setTimeout(() => {
+            if (this.demonImg) {
+                this.demonImg.style.display = 'none';
+            }
+        }, 2000);
+    }
+    
     setupEventListeners() {
         // Mouse events
         this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
@@ -295,6 +325,8 @@ class MazeGame {
         // Check collision with walls
         if (this.checkCollision(newX, newY)) {
             console.log('Wall collision detected, restarting level...');
+            // Show demon image for jump scare effect
+            this.showDemonImage();
             // Automatically restart the level by showing the play screen again
             this.restartLevel();
             return;
