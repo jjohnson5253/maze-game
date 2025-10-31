@@ -49,8 +49,8 @@ class MazeGame {
         // Fixed maze dimensions
         this.canvas.width = this.mazeWidth;  // Always 300px wide
         
-        // Calculate height to maintain good proportions (4:3 aspect ratio)
-        const mazeHeight = Math.floor(this.mazeWidth * 0.75); // 225px height
+        // Make maze twice as long height-wise (450px instead of 225px)
+        const mazeHeight = Math.floor(this.mazeWidth * 1.5); // 450px height (300 * 1.5)
         this.canvas.height = mazeHeight;
         
         // Set CSS dimensions to match canvas dimensions
