@@ -4,7 +4,6 @@ class MazeGame {
         this.ctx = this.canvas.getContext('2d');
         this.statusElement = document.getElementById('status'); // May be null
         this.levelDisplay = document.getElementById('level-display'); // May be null
-        this.restartBtn = document.getElementById('restart-btn');
         this.startScreen = document.getElementById('start-screen');
         this.playBtn = document.getElementById('play-btn');
         
@@ -265,9 +264,6 @@ class MazeGame {
         
         // Play button
         this.playBtn.addEventListener('click', () => this.startGame());
-        
-        // Restart button
-        this.restartBtn.addEventListener('click', () => this.restartLevel());
         
         // Window resize
         window.addEventListener('resize', () => this.handleResize());
