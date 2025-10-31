@@ -79,37 +79,35 @@ class MazeGame {
     }
     
     generateLevel1() {
-        // Simple maze with vertical path from top middle to bottom middle
-        const cols = this.maze[0].length;
-        const rows = this.maze.length;
-        const midX = Math.floor(cols / 2);
+        // Simple hand-crafted maze with progressively narrowing paths
+        const cols = this.maze[0].length;  // 50 columns
+        const rows = this.maze.length;     // 75 rows  
+        const midX = Math.floor(cols / 2); // 25 (center column)
         
-        // Create a simple path
-        for (let y = 1; y < rows - 1; y++) {
-            for (let x = 1; x < cols - 1; x++) {
-                this.maze[y][x] = 0;
+        // Fill entire maze with walls first
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                this.maze[y][x] = 1;
             }
         }
         
-        // Add some walls to create a simple maze (adjusted for smaller cells)
-        for (let y = 5; y < rows - 5; y += 8) {
-            for (let x = 8; x < cols - 8; x += 10) {
-                // Skip walls that would block the center vertical path
-                if (Math.abs(x - midX) > 5) {
-                    // Create small wall clusters
-                    for (let dy = 0; dy < 4; dy++) {
-                        for (let dx = 0; dx < 4; dx++) {
-                            if (y + dy < rows && x + dx < cols) {
-                                this.maze[y + dy][x + dx] = 1;
-                            }
-                        }
-                    }
+        // Create three sections with progressively narrower paths
+        const firstThird = Math.floor(rows / 3);   // 0-25 rows
+        const secondThird = Math.floor(rows * 2 / 3); // 26-50 rows
+        // Third section: 51-75 rows
+        
+        // FIRST THIRD: Wide path (12 cells wide = ±6 from center)
+        for (let y = 1; y < firstThird; y++) {
+            for (let pathWidth = -6; pathWidth <= 6; pathWidth++) {
+                const pathX = midX + pathWidth;
+                if (pathX >= 1 && pathX < cols - 1) {
+                    this.maze[y][pathX] = 0;
                 }
             }
         }
         
-        // Ensure clear vertical path down the middle (wider path for tiny cells)
-        for (let y = 1; y < rows - 1; y++) {
+        // SECOND THIRD: Medium path (6 cells wide = ±3 from center)  
+        for (let y = firstThird; y < secondThird; y++) {
             for (let pathWidth = -3; pathWidth <= 3; pathWidth++) {
                 const pathX = midX + pathWidth;
                 if (pathX >= 1 && pathX < cols - 1) {
@@ -117,6 +115,55 @@ class MazeGame {
                 }
             }
         }
+        
+        // THIRD THIRD: Narrow path (3 cells wide = ±1 from center, plus center)
+        for (let y = secondThird; y < rows - 1; y++) {
+            for (let pathWidth = -1; pathWidth <= 1; pathWidth++) {
+                const pathX = midX + pathWidth;
+                if (pathX >= 1 && pathX < cols - 1) {
+                    this.maze[y][pathX] = 0;
+                }
+            }
+        }
+        
+        // Add some simple obstacles in the wide sections for interest
+        // First third: Add a few simple wall blocks
+        const obstacle1Y = Math.floor(firstThird * 0.3);
+        const obstacle2Y = Math.floor(firstThird * 0.7);
+        
+        // Left obstacle in first third
+        for (let x = midX - 4; x <= midX - 2; x++) {
+            for (let y = obstacle1Y; y <= obstacle1Y + 2; y++) {
+                if (x >= 1 && x < cols - 1 && y >= 1 && y < rows - 1) {
+                    this.maze[y][x] = 1;
+                }
+            }
+        }
+        
+        // Right obstacle in first third
+        for (let x = midX + 2; x <= midX + 4; x++) {
+            for (let y = obstacle2Y; y <= obstacle2Y + 2; y++) {
+                if (x >= 1 && x < cols - 1 && y >= 1 && y < rows - 1) {
+                    this.maze[y][x] = 1;
+                }
+            }
+        }
+        
+        // Second third: Add smaller obstacles
+        const obstacle3Y = Math.floor(firstThird + (secondThird - firstThird) * 0.5);
+        // Center obstacle in second third  
+        for (let x = midX - 1; x <= midX + 1; x++) {
+            for (let y = obstacle3Y; y <= obstacle3Y + 1; y++) {
+                if (x >= 1 && x < cols - 1 && y >= 1 && y < rows - 1) {
+                    this.maze[y][x] = 1;
+                }
+            }
+        }
+        // Create passage around the obstacle
+        this.maze[obstacle3Y][midX - 2] = 0;
+        this.maze[obstacle3Y][midX + 2] = 0;
+        this.maze[obstacle3Y + 1][midX - 2] = 0;
+        this.maze[obstacle3Y + 1][midX + 2] = 0;
     }
     
 
