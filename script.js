@@ -27,8 +27,9 @@ class MazeGame {
         this.mouseY = 0;
         this.isMouseOverCanvas = false;
         
-        // Maze properties
-        this.cellSize = 40;
+        // Maze properties - Fixed size
+        this.cellSize = 50; // Fixed wall width
+        this.mazeWidth = 300; // Fixed maze width
         this.maze = [];
         this.startPos = { x: 0, y: 0 };
         this.endPos = { x: 0, y: 0 };
@@ -45,24 +46,22 @@ class MazeGame {
     }
     
     setupCanvas() {
-        // Set up canvas size based on screen
-        const container = this.canvas.parentElement;
-        const maxWidth = Math.min(800, window.innerWidth - 40);
-        const maxHeight = Math.min(600, window.innerHeight - 200);
+        // Fixed maze dimensions
+        this.canvas.width = this.mazeWidth;  // Always 300px wide
         
-        this.canvas.width = maxWidth;
-        this.canvas.height = maxHeight;
+        // Calculate height to maintain good proportions (4:3 aspect ratio)
+        const mazeHeight = Math.floor(this.mazeWidth * 0.75); // 225px height
+        this.canvas.height = mazeHeight;
         
-        // Update cell size based on canvas size
-        this.cellSize = Math.max(30, Math.min(50, maxWidth / 16));
-        
-        this.canvas.style.width = maxWidth + 'px';
-        this.canvas.style.height = maxHeight + 'px';
+        // Set CSS dimensions to match canvas dimensions
+        this.canvas.style.width = this.mazeWidth + 'px';
+        this.canvas.style.height = mazeHeight + 'px';
     }
     
     generateMaze() {
-        const cols = Math.floor(this.canvas.width / this.cellSize);
-        const rows = Math.floor(this.canvas.height / this.cellSize);
+        // Fixed maze grid: 300px / 50px = 6 cols, 225px / 50px = 4.5 ≈ 5 rows (rounded up)
+        const cols = Math.floor(this.canvas.width / this.cellSize);   // 6 columns
+        const rows = Math.floor(this.canvas.height / this.cellSize);  // 4-5 rows depending on height
         
         // Create maze array (1 = wall, 0 = path)
         this.maze = [];

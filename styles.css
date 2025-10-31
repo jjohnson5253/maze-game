@@ -98,8 +98,9 @@ h1 {
     cursor: none;
     display: block;
     margin: 0 auto;
-    max-width: 100%;
-    height: auto;
+    /* Fixed size - no responsive scaling */
+    width: 300px !important;
+    height: 225px !important;
 }
 
 .start-screen {
@@ -226,9 +227,9 @@ h1 {
     }
     
     #gameCanvas {
-        width: 100%;
-        max-width: 100%;
-        height: auto;
+        /* Keep fixed size even on mobile */
+        width: 300px !important;
+        height: 225px !important;
     }
     
     .game-info {
