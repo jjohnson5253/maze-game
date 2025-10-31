@@ -268,10 +268,14 @@ class MazeGame {
     }
     
     startGame() {
+        console.log('Start game called');
         this.showingStartScreen = false;
         this.startScreen.classList.add('hidden');
         this.gameStarted = true;
-        this.statusElement.textContent = 'Navigate to the red area to win!';
+        
+        if (this.statusElement) {
+            this.statusElement.textContent = 'Navigate to the red area to win!';
+        }
         
         // Set initial mouse position to start position so player doesn't immediately lose
         this.mouseX = this.startPos.x;
@@ -281,6 +285,7 @@ class MazeGame {
         
         // Enable cursor tracking
         this.canvas.style.cursor = 'none';
+        console.log('Game started successfully');
     }
 
     handleMouseMove(e) {
@@ -325,9 +330,9 @@ class MazeGame {
         
         // Check collision with walls
         if (this.checkCollision(newX, newY)) {
-            this.gameLost = true;
-            this.statusElement.textContent = 'Game Over! You hit a wall. Try again!';
-            this.statusElement.style.color = '#ff4444';
+            console.log('Wall collision detected, restarting level...');
+            // Automatically restart the level by showing the play screen again
+            this.restartLevel();
             return;
         }
         
@@ -385,24 +390,33 @@ class MazeGame {
     }
     
     restartLevel() {
+        console.log('Restart level called');
         if (this.gameWon && this.currentLevel < 3) {
             this.currentLevel++;
             this.levelDisplay.textContent = `Challenge ${this.currentLevel}`;
         }
         
+        // Reset all game state
         this.showingStartScreen = true;
         this.gameStarted = false;
         this.gameWon = false;
         this.gameLost = false;
-        this.statusElement.textContent = 'Click PLAY to start your maze adventure!';
-        this.statusElement.style.color = 'white';
+        
+        // Update status
+        if (this.statusElement) {
+            this.statusElement.textContent = 'Click PLAY to start your maze adventure!';
+            this.statusElement.style.color = 'white';
+        }
         
         // Show start screen again
         this.startScreen.classList.remove('hidden');
         this.canvas.style.cursor = 'default';
         
+        // Regenerate maze and reposition elements
         this.generateMaze();
         this.positionPlayButton();
+        
+        console.log('Restart completed - start screen should be visible');
     }
     
     handleResize() {
