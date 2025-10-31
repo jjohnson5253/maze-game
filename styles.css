@@ -20,7 +20,7 @@ body {
     top: 20px;
     right: 20px;
     color: #ffffff;
-    background: rgba(255, 107, 53, 0.8);
+    background: rgba(0, 0, 0, 0.7);
     padding: 12px;
     border-radius: 50%;
     transition: all 0.3s ease;
@@ -34,11 +34,11 @@ body {
 }
 
 .github-link:hover {
-    color: #ff6b35;
-    background: rgba(255, 107, 53, 0.1);
+    color: #000000;
+    background: rgba(255, 255, 255, 0.9);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 107, 53, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.8);
 }
 
 .github-link svg {
